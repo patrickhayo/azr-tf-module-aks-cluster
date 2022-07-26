@@ -1,11 +1,11 @@
-# azr-tf-module-template
+# azr-tf-module-aks-cluster
 
-[Terraform](https://www.terraform.io) Module to create **[NAME]** in Azure
+[Terraform](https://www.terraform.io) Module to create **Azure Kubernetes Service (AKS)** in Azure
 
 <!-- BEGIN_TF_DOCS -->
 ## Prerequisites
 
-- [Terraform](https://releases.hashicorp.com/terraform/) v0.12+
+- [Terraform](https://releases.hashicorp.com/terraform/) v1.1.7+
 
 ## Providers
 
