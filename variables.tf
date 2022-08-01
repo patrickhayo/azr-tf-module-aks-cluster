@@ -113,12 +113,12 @@ variable "network_plugin" {
 
   validation {
     condition     = contains(["azure", "kubenet", "none"], var.network_plugin)
-    error_message = "When network_plugin is set to azure - the vnet_subnet_id field in the default_node_pool block must be set and pod_cidr must not be set."
+    error_message = "When network_plugin is set to azure - the vnet_subnet_id field in the node_pool block must be set and pod_cidr must not be set."
   }
 
   validation {
     condition     = var.network_plugin == "azure" && var.vnet_subnet_id == "" && var.network_service_cidr == ""
-    error_message = "When network_plugin is set to azure - the vnet_subnet_id field in the default_node_pool block must be set and pod_cidr must not be set."
+    error_message = "When network_plugin is set to azure - the vnet_subnet_id field in the node_pool block must be set and pod_cidr must not be set."
   }
 }
 
@@ -133,7 +133,7 @@ variable "outbound_type" {
   }
 }
 
-variable "default_node_pool_vm_size" {
+variable "node_pool_vm_size" {
   description = "(Required) The size of the Virtual Machine, such as Standard_DS2_v2. Changing this forces a new resource to be created."
   default     = "Standard_F8s_v2"
   type        = string
@@ -145,73 +145,73 @@ variable "zones" {
   type        = list(string)
 }
 
-variable "default_node_pool_name" {
+variable "node_pool_name" {
   description = "(Required) The name which should be used for the default Kubernetes Node Pool. Changing this forces a new resource to be created."
   default     = "system"
   type        = string
 }
 
-variable "default_node_pool_subnet_name" {
+variable "node_pool_subnet_name" {
   description = "(Required) Specifies the name of the subnet that hosts the default node pool"
   default     = "SystemSubnet"
   type        = string
 }
 
-variable "default_node_pool_enable_auto_scaling" {
+variable "node_pool_enable_auto_scaling" {
   description = "(Optional) Whether to enable auto-scaler. Defaults to false."
   type        = bool
   default     = false
 }
 
-variable "default_node_pool_enable_host_encryption" {
+variable "node_pool_enable_host_encryption" {
   description = "(Optional) Should the nodes in this Node Pool have host encryption enabled? Defaults to false."
   type        = bool
   default     = false
 }
 
-variable "default_node_pool_enable_node_public_ip" {
+variable "node_pool_enable_node_public_ip" {
   description = "(Optional) Should each node have a Public IP Address? Defaults to false. Changing this forces a new resource to be created."
   type        = bool
   default     = false
 }
 
-variable "default_node_pool_max_pods" {
+variable "node_pool_max_pods" {
   description = "(Optional) The maximum number of pods that can run on each agent. Changing this forces a new resource to be created."
   type        = number
   default     = 50
 }
 
-variable "default_node_pool_node_labels" {
+variable "node_pool_node_labels" {
   description = "(Optional) A list of Kubernetes taints which should be applied to nodes in the agent pool (e.g key=value:NoSchedule). Changing this forces a new resource to be created."
   type        = map(any)
   default     = {}
 }
 
-variable "default_node_pool_node_taints" {
+variable "node_pool_node_taints" {
   description = "(Optional) A map of Kubernetes labels which should be applied to nodes in this Node Pool. Changing this forces a new resource to be created."
   type        = list(string)
   default     = []
 }
 
-variable "default_node_pool_os_disk_type" {
+variable "node_pool_os_disk_type" {
   description = "(Optional) The type of disk which should be used for the Operating System. Possible values are Ephemeral and Managed. Defaults to Managed. Changing this forces a new resource to be created."
   type        = string
   default     = "Ephemeral"
 }
 
-variable "default_node_pool_max_count" {
+variable "node_pool_max_count" {
   description = "(Required) The maximum number of nodes which should exist within this Node Pool. Valid values are between 0 and 1000 and must be greater than or equal to min_count."
   type        = number
   default     = 10
 }
 
-variable "default_node_pool_min_count" {
+variable "node_pool_min_count" {
   description = "(Required) The minimum number of nodes which should exist within this Node Pool. Valid values are between 0 and 1000 and must be less than or equal to max_count."
   type        = number
   default     = 3
 }
 
-variable "default_node_pool_node_count" {
+variable "node_pool_node_count" {
   description = "(Optional) The initial number of nodes which should exist within this Node Pool. Valid values are between 0 and 1000 and must be a value in the range min_count - max_count."
   type        = number
   default     = 3
