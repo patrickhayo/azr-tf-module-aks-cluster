@@ -15,12 +15,16 @@ locals {
   tags = merge(var.tags, local.module_tag)
 }
 
+data "azurerm_kubernetes_service_versions" "current" {
+  location = var.location
+}
+
 resource "azurerm_kubernetes_cluster" "this" {
   name                                = var.name
   location                            = var.location
   resource_group_name                 = var.resource_group_name
   node_resource_group                 = "${var.resource_group_name}_NODES"
-  kubernetes_version                  = var.kubernetes_version
+  kubernetes_version                  = var.kubernetes_version == "latest" ? data.azurerm_kubernetes_service_versions.current.latest_version : var.kubernetes_version
   dns_prefix                          = var.dns_prefix
   private_cluster_enabled             = var.private_cluster_enabled
   private_dns_zone_id                 = var.private_dns_zone_id

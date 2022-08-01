@@ -37,7 +37,7 @@ variable "private_dns_zone_id" {
 }
 
 variable "private_cluster_public_fqdn_enabled" {
-  description = " (Optional) Specifies whether a Public FQDN for this Private Cluster should be added. Defaults to false."
+  description = "(Optional) Specifies whether a Public FQDN for this Private Cluster should be added. Defaults to false."
   type        = bool
   default     = false
 }
@@ -83,33 +83,43 @@ variable "sku_tier" {
 }
 
 variable "kubernetes_version" {
-  description = "Specifies the AKS Kubernetes version"
-  default     = "1.21.1"
+  description = "(Optional) Version of Kubernetes specified when creating the AKS managed cluster. If not specified, the latest recommended version will be used at provisioning time (but won't auto-upgrade)."
+  default     = "latest"
   type        = string
 }
 
 variable "network_docker_bridge_cidr" {
-  description = "Specifies the Docker bridge CIDR"
-  default     = "172.17.0.1/16"
+  description = "(Optional) IP address (in CIDR notation) used as the Docker bridge IP address on nodes. Changing this forces a new resource to be created."
+  default     = ""
   type        = string
 }
 
 variable "network_dns_service_ip" {
-  description = "Specifies the DNS service IP"
-  default     = "10.2.0.10"
+  description = "(Optional) IP address within the Kubernetes service address range that will be used by cluster service discovery (kube-dns). Changing this forces a new resource to be created."
+  default     = ""
   type        = string
 }
 
 variable "network_service_cidr" {
-  description = "Specifies the service CIDR"
-  default     = "10.2.0.0/24"
+  description = "(Optional) The Network Range used by the Kubernetes service. Changing this forces a new resource to be created."
+  default     = ""
   type        = string
 }
 
 variable "network_plugin" {
-  description = "Specifies the network plugin of the AKS cluster"
+  description = "(Required) Network plugin to use for networking. Currently supported values are azure, kubenet and none. Changing this forces a new resource to be created."
   default     = "azure"
   type        = string
+
+  validation {
+    condition     = contains(["azure", "kubenet", "none"], var.network_plugin)
+    error_message = "When network_plugin is set to azure - the vnet_subnet_id field in the default_node_pool block must be set and pod_cidr must not be set."
+  }
+
+  validation {
+    condition     = var.network_plugin == "azure" && var.vnet_subnet_id == "" && var.network_service_cidr == ""
+    error_message = "When network_plugin is set to azure - the vnet_subnet_id field in the default_node_pool block must be set and pod_cidr must not be set."
+  }
 }
 
 variable "outbound_type" {
@@ -130,7 +140,7 @@ variable "default_node_pool_vm_size" {
 }
 
 variable "default_node_pool_availability_zones" {
-  description = "Specifies the availability zones of the default node pool"
+  description = "(Optional) Specifies the availability zones of the default node pool"
   default     = ["1", "2", "3"]
   type        = list(string)
 }
@@ -142,15 +152,9 @@ variable "default_node_pool_name" {
 }
 
 variable "default_node_pool_subnet_name" {
-  description = "Specifies the name of the subnet that hosts the default node pool"
+  description = "(Required) Specifies the name of the subnet that hosts the default node pool"
   default     = "SystemSubnet"
   type        = string
-}
-
-variable "default_node_pool_subnet_address_prefix" {
-  description = "Specifies the address prefix of the subnet that hosts the default node pool"
-  default     = ["10.0.0.0/20"]
-  type        = list(string)
 }
 
 variable "default_node_pool_enable_auto_scaling" {
@@ -240,7 +244,7 @@ variable "microsoft_defender_enabled" {
 }
 
 variable "oms_agent" {
-  description = "Specifies the OMS agent addon configuration."
+  description = "(Optional) Specifies the OMS agent addon configuration."
   type = object({
     enabled                    = bool
     log_analytics_workspace_id = string
@@ -252,7 +256,7 @@ variable "oms_agent" {
 }
 
 variable "ingress_application_gateway" {
-  description = "Specifies the Application Gateway Ingress Controller addon configuration."
+  description = "(Optional) Specifies the Application Gateway Ingress Controller addon configuration."
   type = object({
     enabled      = bool
     gateway_id   = string
@@ -270,7 +274,7 @@ variable "ingress_application_gateway" {
 }
 
 variable "aci_connector_linux" {
-  description = "Specifies the ACI connector addon configuration."
+  description = "(Optional) Specifies the ACI connector addon configuration."
   type = object({
     enabled     = bool
     subnet_name = string
@@ -282,19 +286,19 @@ variable "aci_connector_linux" {
 }
 
 variable "azure_policy_enabled" {
-  description = "Specifies the Azure Policy addon configuration."
+  description = "(Optional) Specifies the Azure Policy addon configuration."
   type        = bool
   default     = false
 }
 
 variable "http_application_routing_enabled" {
-  description = "Specifies the HTTP Application Routing addon configuration."
+  description = "(Optional) Specifies the HTTP Application Routing addon configuration."
   type        = bool
   default     = false
 }
 
 variable "kube_dashboard" {
-  description = "Specifies the Kubernetes Dashboard addon configuration."
+  description = "(Optional) Specifies the Kubernetes Dashboard addon configuration."
   type = object({
     enabled = bool
   })
