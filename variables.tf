@@ -8,24 +8,15 @@ variable "resource_group_name" {
   type        = string
 }
 
-variable "resource_group_id" {
-  description = "(Required) Specifies the resource id of the resource group."
-  type        = string
-}
-
 variable "location" {
   description = "(Required) Specifies the location where the AKS cluster will be deployed."
   type        = string
 }
 
-variable "aks_identity_name" {
-  description = "(Required) Specifies the name of the AKS cluster Identiy."
+variable "identity_id" {
+  description = "(Optional) Specifies the ID of the AKS cluster Identiy."
   type        = string
-}
-
-variable "aks_identity_resource_group_name" {
-  description = "(Required) Specifies the name of the AKS cluster Identiy resource group."
-  type        = string
+  default     = null
 }
 
 variable "dns_prefix" {
@@ -34,7 +25,19 @@ variable "dns_prefix" {
 }
 
 variable "private_cluster_enabled" {
-  description = "Should this Kubernetes Cluster have its API server only exposed on internal IP addresses? This provides a Private IP Address for the Kubernetes API on the Virtual Network where the Kubernetes Cluster is located. Defaults to false. Changing this forces a new resource to be created."
+  description = "(Optional) Should this Kubernetes Cluster have its API server only exposed on internal IP addresses? This provides a Private IP Address for the Kubernetes API on the Virtual Network where the Kubernetes Cluster is located. Defaults to false. Changing this forces a new resource to be created."
+  type        = bool
+  default     = false
+}
+
+variable "private_dns_zone_id" {
+  description = "(Optional) Should this Kubernetes Cluster have its API server only exposed on internal IP addresses? This provides a Private IP Address for the Kubernetes API on the Virtual Network where the Kubernetes Cluster is located. Defaults to false. Changing this forces a new resource to be created."
+  type        = bool
+  default     = false
+}
+
+variable "private_cluster_public_fqdn_enabled" {
+  description = " (Optional) Specifies whether a Public FQDN for this Private Cluster should be added. Defaults to false."
   type        = bool
   default     = false
 }
@@ -85,18 +88,6 @@ variable "kubernetes_version" {
   type        = string
 }
 
-variable "default_node_pool_vm_size" {
-  description = "Specifies the vm size of the default node pool"
-  default     = "Standard_F8s_v2"
-  type        = string
-}
-
-variable "default_node_pool_availability_zones" {
-  description = "Specifies the availability zones of the default node pool"
-  default     = ["1", "2", "3"]
-  type        = list(string)
-}
-
 variable "network_docker_bridge_cidr" {
   description = "Specifies the Docker bridge CIDR"
   default     = "172.17.0.1/16"
@@ -124,16 +115,28 @@ variable "network_plugin" {
 variable "outbound_type" {
   description = "(Optional) The outbound (egress) routing method which should be used for this Kubernetes Cluster. Possible values are loadBalancer and userDefinedRouting. Defaults to loadBalancer."
   type        = string
-  default     = "userDefinedRouting"
+  default     = "loadBalancer"
 
   validation {
-    condition     = contains(["loadBalancer", "userDefinedRouting"], var.outbound_type)
+    condition     = contains(["loadBalancer", "userDefinedRouting", "managedNATGateway", "userAssignedNATGateway"], var.outbound_type)
     error_message = "The outbound type is invalid."
   }
 }
 
+variable "default_node_pool_vm_size" {
+  description = "(Required) The size of the Virtual Machine, such as Standard_DS2_v2. Changing this forces a new resource to be created."
+  default     = "Standard_F8s_v2"
+  type        = string
+}
+
+variable "default_node_pool_availability_zones" {
+  description = "Specifies the availability zones of the default node pool"
+  default     = ["1", "2", "3"]
+  type        = list(string)
+}
+
 variable "default_node_pool_name" {
-  description = "Specifies the name of the default node pool"
+  description = "(Required) The name which should be used for the default Kubernetes Node Pool. Changing this forces a new resource to be created."
   default     = "system"
   type        = string
 }
@@ -218,12 +221,6 @@ variable "log_analytics_workspace_id" {
 variable "tenant_id" {
   description = "(Required) The tenant id of the system assigned identity which is used by master components."
   type        = string
-}
-
-variable "log_analytics_retention_days" {
-  description = "Specifies the number of days of the retention policy"
-  type        = number
-  default     = 30
 }
 
 variable "vnet_subnet_id" {

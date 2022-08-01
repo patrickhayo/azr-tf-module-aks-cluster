@@ -15,21 +15,18 @@ locals {
   tags = merge(var.tags, local.module_tag)
 }
 
-data "azurerm_user_assigned_identity" "aks_identity" {
-  name                = var.aks_identity_name
-  resource_group_name = var.aks_identity_resource_group_name
-}
-
-resource "azurerm_kubernetes_cluster" "aks_cluster" {
-  name                      = var.name
-  location                  = var.location
-  resource_group_name       = var.resource_group_name
-  node_resource_group       = "${var.resource_group_name}_NODES"
-  kubernetes_version        = var.kubernetes_version
-  dns_prefix                = var.dns_prefix
-  private_cluster_enabled   = var.private_cluster_enabled
-  automatic_channel_upgrade = var.automatic_channel_upgrade
-  sku_tier                  = var.sku_tier
+resource "azurerm_kubernetes_cluster" "this" {
+  name                                = var.name
+  location                            = var.location
+  resource_group_name                 = var.resource_group_name
+  node_resource_group                 = "${var.resource_group_name}_NODES"
+  kubernetes_version                  = var.kubernetes_version
+  dns_prefix                          = var.dns_prefix
+  private_cluster_enabled             = var.private_cluster_enabled
+  private_dns_zone_id                 = var.private_dns_zone_id
+  private_cluster_public_fqdn_enabled = var.private_cluster_public_fqdn_enabled
+  automatic_channel_upgrade           = var.automatic_channel_upgrade
+  sku_tier                            = var.sku_tier
 
   default_node_pool {
     name                   = var.default_node_pool_name
@@ -54,14 +51,22 @@ resource "azurerm_kubernetes_cluster" "aks_cluster" {
     ssh_key {
       key_data = var.ssh_public_key
     }
+
   }
 
   identity {
-    type = "UserAssigned"
-    identity_ids = [
-      data.azurerm_user_assigned_identity.aks_identity.id
-    ]
+    type = var.identity_id == null ? "SystemAssigned" : "UserAssigned"
+    identity_ids = var.identity_name == null ? [
+      var.identity_id
+    ] : null
   }
+
+  # identity {
+  #   type = "UserAssigned"
+  #   identity_ids = [
+  #     data.azurerm_user_assigned_identity.this.id
+  #   ]
+  # }
 
   network_profile {
     docker_bridge_cidr = var.network_docker_bridge_cidr
