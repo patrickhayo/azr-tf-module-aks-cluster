@@ -106,8 +106,8 @@ module "aks" {
   source = "./module"
 
   name                              = "myAKSCluster"
-  location                          = "westeurope"
-  resource_group_name               = "myAKSClusterResourceGroup"
+  location                          = azurerm_resource_group.this.location
+  resource_group_name               = azurerm_resource_group.this.name
   vnet_subnet_id                    = "myAKSClusterSubnetId"
   node_pool_name                    = "system"
   enable_auto_scaling               = true
