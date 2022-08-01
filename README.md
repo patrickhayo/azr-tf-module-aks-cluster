@@ -49,7 +49,6 @@ No modules.
 | <a name="input_automatic_channel_upgrade"></a> [automatic\_channel\_upgrade](#input\_automatic\_channel\_upgrade) | (Optional) The upgrade channel for this Kubernetes Cluster. Possible values are patch, rapid, and stable. | `string` | `"stable"` | no |
 | <a name="input_azure_policy_enabled"></a> [azure\_policy\_enabled](#input\_azure\_policy\_enabled) | (Optional) Specifies the Azure Policy addon configuration. | `bool` | `false` | no |
 | <a name="input_azure_rbac_enabled"></a> [azure\_rbac\_enabled](#input\_azure\_rbac\_enabled) | (Optional) Is Role Based Access Control based on Azure AD enabled? | `bool` | `true` | no |
-| <a name="input_default_node_pool_availability_zones"></a> [default\_node\_pool\_availability\_zones](#input\_default\_node\_pool\_availability\_zones) | (Optional) Specifies the availability zones of the default node pool | `list(string)` | <pre>[<br>  "1",<br>  "2",<br>  "3"<br>]</pre> | no |
 | <a name="input_default_node_pool_enable_auto_scaling"></a> [default\_node\_pool\_enable\_auto\_scaling](#input\_default\_node\_pool\_enable\_auto\_scaling) | (Optional) Whether to enable auto-scaler. Defaults to false. | `bool` | `false` | no |
 | <a name="input_default_node_pool_enable_host_encryption"></a> [default\_node\_pool\_enable\_host\_encryption](#input\_default\_node\_pool\_enable\_host\_encryption) | (Optional) Should the nodes in this Node Pool have host encryption enabled? Defaults to false. | `bool` | `false` | no |
 | <a name="input_default_node_pool_enable_node_public_ip"></a> [default\_node\_pool\_enable\_node\_public\_ip](#input\_default\_node\_pool\_enable\_node\_public\_ip) | (Optional) Should each node have a Public IP Address? Defaults to false. Changing this forces a new resource to be created. | `bool` | `false` | no |
@@ -81,6 +80,7 @@ No modules.
 | <a name="input_role_based_access_control_enabled"></a> [role\_based\_access\_control\_enabled](#input\_role\_based\_access\_control\_enabled) | (Required) Is Role Based Access Control Enabled? Changing this forces a new resource to be created. | `bool` | `true` | no |
 | <a name="input_sku_tier"></a> [sku\_tier](#input\_sku\_tier) | (Optional) The SKU Tier that should be used for this Kubernetes Cluster. Possible values are Free and Paid (which includes the Uptime SLA). Defaults to Free. | `string` | `"Free"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | (Optional) Specifies the tags of the bastion host | `map` | `{}` | no |
+| <a name="input_zones"></a> [zones](#input\_zones) | (Optional) Specifies the availability zones of the default node pool | `list(string)` | <pre>[<br>  "1",<br>  "2",<br>  "3"<br>]</pre> | no |
 
 ## Outputs
 
@@ -102,6 +102,26 @@ resource "azurerm_resource_group" "this" {
   location = "westeurope"
 }
 
+module "aks" {
+  source = "./module"
+
+  name                              = "myAKSCluster"
+  location                          = "westeurope"
+  resource_group_name               = "myAKSClusterResourceGroup"
+  vnet_subnet_id                    = "myAKSClusterSubnetId"
+  node_pool_name                    = "system"
+  enable_auto_scaling               = true
+  max_pods                          = 30
+  max_count                         = 10
+  min_count                         = 2
+  admin_username                    = "myUserName"
+  key_data                          = "myOpenSslPublicKey"
+  network_policy                    = "calico"
+  role_based_access_control_enabled = true
+  tags = {
+    "description" = "Powered by Terraform"
+  }
+}
 ```
 
 
