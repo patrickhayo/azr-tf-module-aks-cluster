@@ -139,7 +139,7 @@ variable "default_node_pool_vm_size" {
   type        = string
 }
 
-variable "default_node_pool_availability_zones" {
+variable "zones" {
   description = "(Optional) Specifies the availability zones of the default node pool"
   default     = ["1", "2", "3"]
   type        = list(string)
